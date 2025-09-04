@@ -12,6 +12,13 @@ if "df_cache" not in st.session_state:
     st.session_state["df_cache"] = {}  # key = source_key, value = DataFrame
 
 # -------------------------------
+# HELPER FUNCTIONS
+# -------------------------------
+def prettify(name: str) -> str:
+    """Convert snake_case to Title Case for UI display."""
+    return name.replace("_", " ").title()
+
+# -------------------------------
 # PAGE CONTAINER
 # -------------------------------
 with st.container():
@@ -62,51 +69,66 @@ with st.container():
                     conn.close()
                 st.session_state["df_cache"][source_key] = df
 
-    # ---- DATA PROCESSING & FILTERS ----
-    if df is not None:
-        # Convert date if exists
-        if "Date" in df.columns:
-            df["Date"] = pd.to_datetime(df["Date"])
-            df.set_index("Date", inplace=True)
+# -------------------------------
+# DATA PROCESSING & FILTERS
+# -------------------------------
+if df is not None:
+    # Convert Date column if exists
+    if "Date" in df.columns:
+        df["Date"] = pd.to_datetime(df["Date"])
 
-        # Optional numeric conversion
-        numeric_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
-        all_cols = df.columns.tolist()
+    numeric_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
+    all_cols = df.columns.tolist()
 
-        # Filters container
-        with st.container():
-            st.subheader("Filters")
-            filter_col = st.selectbox("Filter column", [None] + all_cols)
-            filter_val = None
-            if filter_col:
-                filter_val = st.selectbox(f"Select {filter_col}", df[filter_col].unique())
-            if filter_col and filter_val is not None:
-                df = df[df[filter_col] == filter_val]
+    # ---- FILTERS ----
+    display_to_col = {prettify(col): col for col in all_cols}
+    with st.container():
+        st.subheader("Filters")
+        filter_display_col = st.selectbox("Filter column", [None] + list(display_to_col.keys()))
+        filter_val = None
+        if filter_display_col:
+            col_name = display_to_col[filter_display_col]
+            filter_val = st.selectbox(f"Select {filter_display_col}", df[col_name].unique())
+        if filter_display_col and filter_val is not None:
+            df = df[df[col_name] == filter_val]
 
-        # Chart options container
-        with st.container():
-            st.subheader("Chart Options")
-            chart_type = st.selectbox("Select chart type", ["Line", "Bar", "Scatter", "Candlestick"])
+    # ---- CHART OPTIONS ----
+    with st.container():
+        st.subheader("Chart Options")
+        chart_type = st.selectbox("Select chart type", ["Line", "Bar", "Scatter", "Candlestick"])
 
-            if numeric_cols:
-                y_col = st.selectbox("Y axis", numeric_cols)
-                x_col = df.index if "Date" in df.columns else st.selectbox("X axis", numeric_cols)
+        if numeric_cols:
+            # Y-axis
+            y_display_to_col = {prettify(col): col for col in numeric_cols}
+            y_display = st.selectbox("Y axis", list(y_display_to_col.keys()))
+            y_col = y_display_to_col[y_display]
 
-            # Plotting
+            # X-axis: Date first if exists, then numeric excluding Y
+            x_options = ["Date"] if "Date" in df.columns else []
+            x_options += [col for col in numeric_cols if col != y_col]
+            x_display_to_col = {prettify(col): col for col in x_options if col != "Date"}
+            if "Date" in df.columns:
+                x_display_to_col["Date"] = "Date"
+
+            x_display = st.selectbox("X axis", list(x_display_to_col.keys()), index=0)
+            x_col = x_display_to_col[x_display]
+            x_data = df[x_col] if x_col in df.columns else df.index
+
+            # ---- PLOTTING ----
             if chart_type == "Line":
-                fig = px.line(df, x=x_col, y=y_col)
+                fig = px.line(df, x=x_data, y=y_col)
                 st.plotly_chart(fig, use_container_width=True)
             elif chart_type == "Bar":
-                fig = px.bar(df, x=x_col, y=y_col)
+                fig = px.bar(df, x=x_data, y=y_col)
                 st.plotly_chart(fig, use_container_width=True)
             elif chart_type == "Scatter":
-                fig = px.scatter(df, x=x_col, y=y_col)
+                fig = px.scatter(df, x=x_data, y=y_col)
                 st.plotly_chart(fig, use_container_width=True)
             elif chart_type == "Candlestick":
                 required_cols = ["Open", "High", "Low", "Close"]
                 if all(col in df.columns for col in required_cols):
                     fig = go.Figure(data=[go.Candlestick(
-                        x=df.index,
+                        x=df["Date"] if "Date" in df.columns else df.index,
                         open=df["Open"],
                         high=df["High"],
                         low=df["Low"],
@@ -114,20 +136,19 @@ with st.container():
                     )])
                     st.plotly_chart(fig, use_container_width=True)
 
-        # Data table container
+    # ---- DATA TABLE ----
+    with st.container():
+        st.subheader("Data Table")
+        st.dataframe(df, use_container_width=True)
+
+    # ---- SUMMARY METRICS ----
+    if numeric_cols:
         with st.container():
-            st.subheader("Data Table")
-            st.dataframe(df, use_container_width=True)
-
-        # Summary metrics container
-        if numeric_cols:
-            with st.container():
-                st.subheader("Summary Metrics")
-                metrics_cols = st.columns(len(numeric_cols))
-                for i, col in enumerate(numeric_cols):
-                    metrics_cols[i].metric(label=f"{col} Min", value=f"{df[col].min():.2f}")
-                    metrics_cols[i].metric(label=f"{col} Max", value=f"{df[col].max():.2f}")
-                    metrics_cols[i].metric(label=f"{col} Avg", value=f"{df[col].mean():.2f}")
-
-    else:
-        st.info("Select or upload a data source to start exploring data.")
+            st.subheader("Summary Metrics")
+            metrics_cols = st.columns(len(numeric_cols))
+            for i, col in enumerate(numeric_cols):
+                metrics_cols[i].metric(label=f"{prettify(col)} Min", value=f"{df[col].min():.2f}")
+                metrics_cols[i].metric(label=f"{prettify(col)} Max", value=f"{df[col].max():.2f}")
+                metrics_cols[i].metric(label=f"{prettify(col)} Avg", value=f"{df[col].mean():.2f}")
+else:
+    st.info("Select or upload a data source to start exploring data.")
