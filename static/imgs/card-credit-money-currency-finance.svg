@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<svg width="800" height="500" viewBox="0 0 20 12" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="amberGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB84D"/>
+      <stop offset="100%" stop-color="#FF9900"/>
+    </linearGradient>
+    <linearGradient id="amberGradientNight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#CC8800"/>
+      <stop offset="100%" stop-color="#996600"/>
+    </linearGradient>
+    <linearGradient id="chipGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700"/>
+      <stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="etchGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.4)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    svg{display:block;margin:auto;background:#101010}
+    .card{fill:none;stroke:url(#amberGradient);stroke-width:0.35;rx:0.6}
+    .amber{fill:url(#amberGradient);rx:0.25}
+    .chip{fill:url(#chipGradient);rx:0.25}
+    .etch{fill:url(#etchGradient)}
+    .logo{fill:url(#amberGradient);rx:0.25}
+    @media (prefers-color-scheme: dark){
+      svg{background:url(#amberGradientNight)}
+      .card{stroke:#222}
+      .amber,.logo{fill:url(#amberGradientNight)}
+    }
+  </style>
+
+  <!-- Card outline -->
+  <rect class="card" x="0.15" y="0.15" width="19.7" height="11.7"/>
+
+  <!-- Logo -->
+  <rect class="logo" x="2" y="1.2" width="4" height="1.5"/>
+  
+  <!-- Chip -->
+  <rect class="chip" x="2" y="3.5" width="3.8" height="2.8"/>
+  <rect class="etch" x="2.4" y="3.7" width="0.25" height="2.4"/>
+  <rect class="etch" x="2.9" y="3.7" width="0.25" height="2.4"/>
+  <rect class="etch" x="3.4" y="3.7" width="0.25" height="2.4"/>
+  <rect class="etch" x="3.9" y="3.7" width="0.25" height="2.4"/>
+  <rect class="etch" x="2.3" y="4.2" width="3.0" height="0.18"/>
+  <rect class="etch" x="2.3" y="4.8" width="3.0" height="0.18"/>
+  <rect class="etch" x="2.3" y="5.4" width="3.0" height="0.18"/>
+
+  <!-- Numbers top row -->
+  <rect class="amber" x="2" y="7.5" width="3.5" height="1.1"/>
+  <rect class="amber" x="6" y="7.5" width="3.5" height="1.1"/>
+  <rect class="amber" x="10" y="7.5" width="3.5" height="1.1"/>
+  <rect class="amber" x="14" y="7.5" width="3.5" height="1.1"/>
+
+  <!-- Numbers bottom row -->
+  <rect class="amber" x="2" y="9.2" width="5" height="1.1"/>
+  <rect class="amber" x="8" y="9.2" width="5" height="1.1"/>
+</svg>

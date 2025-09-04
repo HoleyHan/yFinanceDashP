@@ -1,36 +1,45 @@
+import json
+from pathlib import Path
+import pandas as pd
+import yfinance as yf
 import streamlit as st
 
-# --- PAGE SETUP ---
+@st.cache_data(show_spinner=False)
+def load_refs():
+    path = Path(".streamlit/app_refs.json")
+    with open(path) as f:
+        return json.load(f)
 
-page_price = st.Page(
-    "views/Page_price.py",
-    title="Stock Market",
-    icon=":material/stacked_line_chart:", # from Material Design by Google
-    default=True,
+@st.cache_data
+def fetch_history(symbol, period="1mo", interval="1d"):
+    return yf.Ticker(symbol).history(period=period, interval=interval)
+
+# -------------------- LOAD APP REFS --------------------
+with open(".streamlit/app_refs.json") as f:
+    refs = json.load(f)
+
+# Optional: show welcome or dashboard landing page
+st.set_page_config(
+    page_title="yFinance Dash",
+    page_icon=":chart_with_upwards_trend:",
+    layout="wide"
 )
 
-page_financials = st.Page(
-    "views/Page_financials.py",
-    title="Financials",
-    icon=":material/finance:", # from https://fonts.google.com/icons
-)
+st.title("yFinance Dashboard")
+st.markdown("Welcome! Use the sidebar to navigate between pages.")
 
-page_forex = st.Page(
-    "views/Page_forex.py",
-    title="Forex Market",
-    icon=":material/currency_exchange:",
-)
+# Show categories and key links dynamically if needed
+if "commodities" in refs:
+    st.subheader("Commodity Categories")
+    for category, items in refs["commodities"].items():
+        st.markdown(f"**{category}**: {', '.join(items.keys())}")
 
-page_commodity = st.Page(
-    "views/Page_commodity.py",
-    title="Commodity Market",
-    icon=":material/oil_barrel:",
-)
-
-pg = st.navigation(pages=[page_price, page_financials, page_forex, page_commodity])
-
-# --- SHARED ON ALL PAGES ---
-st.logo("imgs/logo_friendly.png", size="large")
-
-# --- RUN NAVIGATION ---
-pg.run()
+# -------------------- NAVIGATION --------------------
+# Streamlit >=1.18 supports multi-page apps via /pages folder
+# Users navigate to pages like Page_commodity.py automatically
+# Optionally, you can add quick links:
+st.sidebar.markdown("## Quick Navigation")
+st.sidebar.markdown("- [Commodities](./pages/Page_commodity.py)")
+st.sidebar.markdown("- [Financials](./pages/Page_financials.py)")
+st.sidebar.markdown("- [Forex](./pages/Page_forex.py)")
+st.sidebar.markdown("- [Price](./pages/Page_price.py)")

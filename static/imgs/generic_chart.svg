@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB84D"/>
+      <stop offset="100%" stop-color="#FF9900"/>
+    </linearGradient>
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFB84D" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#101010" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="metalEtch" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#FFB84D" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    .bg { fill: #101010; rx: 6; ry: 6; }
+    .chart-bg { fill: #1a1a1a; rx: 4; ry: 4; stroke: #333; stroke-width: 1; }
+    .axes { stroke: #AAAAAA; stroke-width: 1.2; }
+    .bar { fill: url(#primaryGradient); rx: 1.5; ry: 1.5; }
+    .glow { fill: url(#glowGradient); }
+    .etch { stroke: url(#metalEtch); stroke-width: 0.6; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #000000; }
+      .chart-bg { fill: #101010; stroke: #222; }
+      .bar { fill: #FFB84D; }
+    }
+  </style>
+
+  <!-- Outer background -->
+  <rect class="bg" width="64" height="64"/>
+
+  <!-- Subtle glow behind chart -->
+  <circle class="glow" cx="32" cy="32" r="22"/>
+
+  <!-- Chart area -->
+  <rect class="chart-bg" x="12" y="12" width="40" height="40"/>
+
+  <!-- Axes -->
+  <line class="axes" x1="12" y1="48" x2="52" y2="48"/> <!-- X-axis -->
+  <line class="axes" x1="12" y1="12" x2="12" y2="48"/> <!-- Y-axis -->
+
+  <!-- Bars inside chart -->
+  <rect class="bar" x="18" y="36" width="4" height="12"/>
+  <rect class="bar" x="26" y="28" width="4" height="20"/>
+  <rect class="bar" x="34" y="20" width="4" height="28"/>
+  <rect class="bar" x="42" y="26" width="4" height="22"/>
+
+  <!-- Metallic etching grid lines -->
+  <line class="etch" x1="14" y1="32" x2="50" y2="32"/>
+  <line class="etch" x1="14" y1="24" x2="50" y2="24"/>
+  <line class="etch" x1="14" y1="16" x2="50" y2="16"/>
+</svg>

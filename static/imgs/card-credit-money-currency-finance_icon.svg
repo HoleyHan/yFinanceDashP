@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 12">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFB84D" stop-opacity=".25"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFB84D"/>
+      <stop offset="1" stop-color="#FF9900"/>
+    </linearGradient>
+    <linearGradient id="chipGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD700"/>
+      <stop offset="1" stop-color="#E6B800"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    svg{background:#101010;}
+    .glow{fill:url(#glow);}
+    .card{fill:url(#cardGrad);stroke:#FF9900;stroke-width:.3;rx:1.5;}
+    .chip{fill:url(#chipGrad);rx:.5;}
+    .number{fill:#FFB84D;rx:.3;}
+    .etch{stroke:#E6B800;stroke-width:.15;}
+    @media(prefers-color-scheme:dark){
+      svg{background:#000;}
+      .card{stroke:#CC8800;}
+      .number{fill:#CC8800;}
+      .etch{stroke:#CC8800;}
+    }
+  </style>
+
+  <!-- Glow behind card -->
+  <rect class="glow" x=".5" y=".5" width="19" height="11" rx="2"/>
+
+  <!-- Card body -->
+  <rect class="card" x=".5" y=".5" width="19" height="11"/>
+
+  <!-- Chip -->
+  <rect class="chip" x="1.5" y="3" width="5" height="4"/>
+  <line class="etch" x1="1.8" y1="3.5" x2="5.2" y2="3.5"/>
+  <line class="etch" x1="1.8" y1="4.2" x2="5.2" y2="4.2"/>
+
+  <!-- Number placeholders -->
+  <rect class="number" x="8" y="3.5" width="6" height="1.8"/>
+  <rect class="number" x="8" y="6.2" width="10" height="1.8"/>
+</svg>

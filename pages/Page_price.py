@@ -214,7 +214,7 @@ with st.sidebar:
     with col1:
         st.markdown("<p style='text-align: right;'>Powered by:</p>", unsafe_allow_html=True)
     with col2:
-        st.image("imgs/logo_yahoo_lightpurple.svg", width=100)
+        st.image("static/imgs/logo_yahoo_lightpurple.svg", width=100)
 
 # ---- MAINPAGE ----
 st.title("Stock Market")

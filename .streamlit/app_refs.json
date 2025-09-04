@@ -1,0 +1,19 @@
+{
+  "commodities": {
+    "precious_metals": {"Gold": "GC=F", "Silver": "SI=F", "Platinum": "PL=F"},
+    "energy": {"WTI": "CL=F", "Brent": "BZ=F", "Natural Gas": "NG=F"},
+    "agriculture": {"Corn": "ZC=F", "Soybean": "ZS=F", "Wheat": "KE=F"}
+  },
+  "default_periods": ["1d", "5d", "1mo", "3mo", "6mo", "1y"],
+  "default_intervals": ["1m", "5m", "15m", "1h", "1d"],
+  "chart_colors": {
+    "lineColor": "#00BFFF",
+    "hoverLineColor": "#1E90FF",
+    "signalBuyColor": "#32CD32",
+    "signalSellColor": "#FF4500",
+    "highlightColor": "#FFD700",
+    "volumeColor": "#FF8C00",
+    "tooltipBackground": "#262A2F",
+    "tooltipTextColor": "#F0F0F0"
+  }
+}
