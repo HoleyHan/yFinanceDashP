@@ -21,9 +21,9 @@ backgroundColor = "#1C1E22"          # Main dark background
 primaryColor = "#00BFFF"             # Bright cyan for buttons, highlights
 secondaryBackgroundColor = "#2C2F33" # Dark panels (sidebar, charts)
 textColor = "#F0F0F0"                # Main text (off-white)
-font = "Roboto, sans-serif"          # Default font
-headingFont = "Roboto Slab, serif"   # Headings
-codeFont = "Source Code Pro, monospace"  # Code blocks
+font = "sans serif, serif, monospace"          # Default font
+headingFont = "sans serif, serif, monospace"   # Headings
+codeFont = "sans serif, serif, monospace"  # Code blocks
 baseFontSize = 16
 baseFontWeight = 400
 
@@ -66,8 +66,8 @@ codeFontWeight = "400"
 # Sidebar Font (Optional)
 # -----------------------------
 [theme.sidebar]
-font = "Roboto, sans-serif"
-headingFont = "Roboto Slab, serif"
+font = "sans serif, serif, monospace"
+headingFont = "sans serif, serif, monospace"
 codeFont = "Source Code Pro, monospace"
 
 # -----------------------------
