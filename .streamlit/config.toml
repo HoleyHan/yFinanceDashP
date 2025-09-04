@@ -12,35 +12,18 @@ enableStaticServing = true
 toolbarMode = "minimal"
 
 # -----------------------------
-# Theme Settings
+# Theme Settings (current Streamlit 1.30+)
 # -----------------------------
 [theme]
-# Core colors
-base = "dark"
-backgroundColor = "#1C1E22"          # Main dark background
-primaryColor = "#00BFFF"             # Bright cyan for buttons, highlights
-secondaryBackgroundColor = "#2C2F33" # Dark panels (sidebar, charts)
-textColor = "#F0F0F0"                # Main text (off-white)
-font = "sans serif, serif, monospace"          # Default font
-headingFont = "sans serif, serif, monospace"   # Headings
-codeFont = "sans serif, serif, monospace"  # Code blocks
-baseFontSize = 16
-baseFontWeight = 400
-
-# Accent colors for signals, highlights, hover
-accentColor1 = "#FF8C00"  # Orange: alerts / trend changes
-accentColor2 = "#32CD32"  # Lime green: buy / positive
-accentColor3 = "#FFD700"  # Gold: highlights / important info
-accentColor4 = "#1E90FF"  # Deep sky blue: hover / active selection
-accentColor5 = "#FF4500"  # Red-orange: strong warnings / sell signals
-
-# Component backgrounds (cards, small panels, borders, shadows)
-componentBackground1 = "#262A2F"
-componentBackground2 = "#3A3F45"
-textMuted = "#A0A0A0"  # Secondary / label text
+base = "dark"                            # base theme: "light" or "dark"
+primaryColor = "#00BFFF"                 # buttons, highlights
+backgroundColor = "#1C1E22"             # main app background
+secondaryBackgroundColor = "#2C2F33"    # panels, cards
+textColor = "#F0F0F0"                    # main text
+font = "sans serif"                      # allowed: "sans serif", "serif", "monospace"
 
 # -----------------------------
-# Font Faces (Google Fonts Example)
+# Optional: Custom Fonts via CSS
 # -----------------------------
 [[theme.fontFaces]]
 family = "Roboto"
@@ -53,22 +36,6 @@ url = "https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display
 [[theme.fontFaces]]
 family = "Source Code Pro"
 url = "https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap"
-
-# -----------------------------
-# Font Sizes & Weights
-# -----------------------------
-headingFontSizes = ["32px", "28px", "24px", "20px", "18px", "16px"]
-headingFontWeights = ["700", "600", "500", "400", "400", "300"]
-codeFontSize = "14px"
-codeFontWeight = "400"
-
-# -----------------------------
-# Sidebar Font (Optional)
-# -----------------------------
-[theme.sidebar]
-font = "sans serif, serif, monospace"
-headingFont = "sans serif, serif, monospace"
-codeFont = "Source Code Pro, monospace"
 
 # -----------------------------
 # Chart / Plot Defaults
@@ -85,3 +52,27 @@ highlightColor = "#FFD700"         # Highlight lines/markers
 volumeColor = "#FF8C00"            # Volume bars / alerts
 tooltipBackground = "#262A2F"      # Hover tooltip bg
 tooltipTextColor = "#F0F0F0"       # Hover tooltip text
+
+# -----------------------------
+# Additional UI / Dashboard Styling
+# -----------------------------
+[theme.dashboard]
+componentBackground1 = "#262A2F"  # Cards, small panels
+componentBackground2 = "#3A3F45"  # Secondary panels
+textMuted = "#A0A0A0"             # Secondary / label text
+
+# -----------------------------
+# Optional: Sizes & Weights (apply via CSS in Python)
+# -----------------------------
+# headingFontSizes = ["32px", "28px", "24px", "20px", "18px", "16px"]
+# headingFontWeights = ["700", "600", "500", "400", "400", "300"]
+# codeFontSize = "14px"
+# codeFontWeight = "400"
+
+# -----------------------------
+# Sidebar Font (Optional, apply via CSS in Python)
+# -----------------------------
+# [theme.sidebar]
+# font = "sans serif, serif, monospace"
+# headingFont = "sans serif, serif, monospace"
+# codeFont = "Source Code Pro, monospace"
