@@ -40,6 +40,7 @@ if "commodities" in refs:
 # Optionally, you can add quick links:
 st.sidebar.markdown("## Quick Navigation")
 st.sidebar.markdown("- [Commodities](./pages/Page_commodity.py)")
+st.sidebar.markdown("- [Data Exporer](./pages/Page_data_explorer.py)")
 st.sidebar.markdown("- [Financials](./pages/Page_financials.py)")
 st.sidebar.markdown("- [Forex](./pages/Page_forex.py)")
 st.sidebar.markdown("- [Price](./pages/Page_price.py)")
