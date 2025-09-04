@@ -4,9 +4,6 @@ import yfinance as yf
 import plotly.graph_objects as go
 import json
 
-# -----------------------------
-# PAGE CONFIG
-# -----------------------------
 st.set_page_config(
     page_title="Macro Dashboard",
     page_icon=":bar_chart:",
@@ -14,31 +11,23 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# -----------------------------
-# SESSION STATE
-# -----------------------------
+# ---------------- SESSION STATE ----------------
 if 'dark_mode' not in st.session_state:
     st.session_state['dark_mode'] = False
 
-# -----------------------------
-# LOAD CONFIG JSON
-# -----------------------------
+# ---------------- LOAD CONFIG ----------------
 with open(".streamlit/app_refs.json") as f:
     app_refs = json.load(f)
 macros = app_refs.get("macros", {})
 
-# -----------------------------
-# SIDEBAR: PAGE NAVIGATION ONLY
-# -----------------------------
+# ---------------- SIDEBAR ----------------
 with st.sidebar:
-    page = st.selectbox("Pages", options=["Macro Dashboard", "Settings"], index=0)
+    page = st.selectbox("Pages", ["Macro Dashboard", "Settings"])
     st.markdown("---")
 
-# -----------------------------
-# TOPBAR CONTROLS
-# -----------------------------
+# ---------------- TOPBAR FILTERS ----------------
 st.markdown("### Filters")
-col1, col2, col3, col4, col5 = st.columns([2, 3, 3, 2, 1], gap="small")
+col1, col2, col3, col4, col5 = st.columns([2,3,3,2,1], gap="small")
 
 with col1:
     region = st.selectbox("Region", sorted(list(macros.get("interest_rates", {}).keys())))
@@ -49,7 +38,8 @@ with col2:
 with col3:
     all_categories = ["Interest Rates", "Inflation", "FX Rates", "Commodities Indices", "Other Economic Data"]
     if mode == "Single Category":
-        categories = [st.selectbox("Category", all_categories)]
+        category = st.selectbox("Category", all_categories)
+        categories = [category]
     else:
         categories = st.multiselect("Categories", all_categories, default=["Interest Rates"])
 
@@ -58,12 +48,9 @@ with col4:
 
 with col5:
     toggle_theme = st.checkbox("Dark Mode", value=st.session_state["dark_mode"])
-    if toggle_theme != st.session_state["dark_mode"]:
-        st.session_state["dark_mode"] = toggle_theme
+    st.session_state["dark_mode"] = toggle_theme
 
-# -----------------------------
-# LAZY FETCH FUNCTION
-# -----------------------------
+# ---------------- HELPER FUNCTIONS ----------------
 @st.cache_data(ttl=600)
 def fetch_ticker_data(ticker, period):
     try:
@@ -74,9 +61,6 @@ def fetch_ticker_data(ticker, period):
         st.error(f"Error fetching {ticker}: {e}")
         return pd.DataFrame()
 
-# -----------------------------
-# HELPER TO GET TICKERS PER CATEGORY
-# -----------------------------
 def get_tickers(category, region):
     if category == "Interest Rates":
         return macros.get("interest_rates", {}).get(region, {})
@@ -90,15 +74,11 @@ def get_tickers(category, region):
         return macros.get("other", {}).get(region, {})
     return {}
 
-# -----------------------------
-# PAGE DYNAMIC CONTENT
-# -----------------------------
+# ---------------- PAGE LOGIC ----------------
 if page == "Macro Dashboard":
     st.title("Macro Dashboard")
 
-    # SINGLE CATEGORY
     if mode == "Single Category":
-        category = categories[0]
         tickers = get_tickers(category, region)
         if not tickers:
             st.info(f"No data available for {category} ({region})")
@@ -114,14 +94,13 @@ if page == "Macro Dashboard":
                 st.subheader(f"{category} Data Table")
                 st.dataframe(df_category, use_container_width=True)
 
-                # Plot normalized %
                 df_pct = df_category.copy()
                 for col in df_pct.columns:
                     if col != "Date":
                         df_pct[col] = df_pct[col] / df_pct[col].iloc[0] * 100
 
                 fig = go.Figure()
-                colors = ["#00BFFF", "#1E90FF", "#32CD32", "#FF4500", "#FFD700", "#FF8C00", "#8A2BE2"]
+                colors = ["#00BFFF","#1E90FF","#32CD32","#FF4500","#FFD700","#FF8C00","#8A2BE2"]
                 bg_color = "#FFFFFF" if not st.session_state['dark_mode'] else "#262A2F"
                 text_color = "#000000" if not st.session_state['dark_mode'] else "#F0F0F0"
 
@@ -130,7 +109,7 @@ if page == "Macro Dashboard":
                         fig.add_trace(go.Scatter(
                             x=df_pct["Date"], y=df_pct[col],
                             mode='lines+markers', name=col,
-                            line=dict(color=colors[i % len(colors)], width=2),
+                            line=dict(color=colors[i%len(colors)], width=2),
                             marker=dict(size=4),
                             hovertemplate=f"%{{y:.2f}}%<br>Date: %{{x|%Y-%m-%d}}<br>{col}"
                         ))
@@ -146,8 +125,7 @@ if page == "Macro Dashboard":
                 )
                 st.plotly_chart(fig, use_container_width=True)
 
-    # MULTI-CATEGORY OVERLAY
-    else:
+    else:  # multi-category overlay
         df_overlay = pd.DataFrame()
         overlay_names = []
         for category in categories:
@@ -171,7 +149,7 @@ if page == "Macro Dashboard":
                     df_pct[col] = df_pct[col] / df_pct[col].iloc[0] * 100
 
             fig = go.Figure()
-            colors = ["#00BFFF", "#1E90FF", "#32CD32", "#FF4500", "#FFD700", "#FF8C00", "#8A2BE2"]
+            colors = ["#00BFFF","#1E90FF","#32CD32","#FF4500","#FFD700","#FF8C00","#8A2BE2"]
             bg_color = "#FFFFFF" if not st.session_state['dark_mode'] else "#262A2F"
             text_color = "#000000" if not st.session_state['dark_mode'] else "#F0F0F0"
 
@@ -180,7 +158,7 @@ if page == "Macro Dashboard":
                     fig.add_trace(go.Scatter(
                         x=df_pct["Date"], y=df_pct[col],
                         mode='lines+markers', name=col,
-                        line=dict(color=colors[i % len(colors)], width=2),
+                        line=dict(color=colors[i%len(colors)], width=2),
                         marker=dict(size=4),
                         hovertemplate=f"%{{y:.2f}}%<br>Date: %{{x|%Y-%m-%d}}<br>{col}"
                     ))
