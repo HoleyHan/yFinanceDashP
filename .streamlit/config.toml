@@ -1,20 +1,87 @@
+# -----------------------------
+# Server Settings
+# -----------------------------
 [server]
 fileWatcherType = "poll"
+enableStaticServing = true
 
+# -----------------------------
+# Client Settings
+# -----------------------------
 [client]
 toolbarMode = "minimal"
 
+# -----------------------------
+# Theme Settings
+# -----------------------------
 [theme]
-#base="light"
-#backgroundColor="#FFFFFF" # White
-#primaryColor="#FF4B4B" # Light red
-#secondaryBackgroundColor="#F0F2F6" # Light grayish blue
-#textColor="#31333F" # Very dark grayish blue.
+# Core colors
+base = "dark"
+backgroundColor = "#1C1E22"          # Main dark background
+primaryColor = "#00BFFF"             # Bright cyan for buttons, highlights
+secondaryBackgroundColor = "#2C2F33" # Dark panels (sidebar, charts)
+textColor = "#F0F0F0"                # Main text (off-white)
+font = "Roboto, sans-serif"          # Default font
+headingFont = "Roboto Slab, serif"   # Headings
+codeFont = "Source Code Pro, monospace"  # Code blocks
+baseFontSize = 16
+baseFontWeight = 400
 
-#base="dark"
-#backgroundColor="#232b2b" # Black
-#primaryColor="#DC143C" # Crimson
-#secondaryBackgroundColor="#483D8B" # Dark moderate blue.
-#textColor="#F8F8FF"
+# Accent colors for signals, highlights, hover
+accentColor1 = "#FF8C00"  # Orange: alerts / trend changes
+accentColor2 = "#32CD32"  # Lime green: buy / positive
+accentColor3 = "#FFD700"  # Gold: highlights / important info
+accentColor4 = "#1E90FF"  # Deep sky blue: hover / active selection
+accentColor5 = "#FF4500"  # Red-orange: strong warnings / sell signals
 
-font="sans serif"
+# Component backgrounds (cards, small panels, borders, shadows)
+componentBackground1 = "#262A2F"
+componentBackground2 = "#3A3F45"
+textMuted = "#A0A0A0"  # Secondary / label text
+
+# -----------------------------
+# Font Faces (Google Fonts Example)
+# -----------------------------
+[[theme.fontFaces]]
+family = "Roboto"
+url = "https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+
+[[theme.fontFaces]]
+family = "Roboto Slab"
+url = "https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
+
+[[theme.fontFaces]]
+family = "Source Code Pro"
+url = "https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap"
+
+# -----------------------------
+# Font Sizes & Weights
+# -----------------------------
+headingFontSizes = ["32px", "28px", "24px", "20px", "18px", "16px"]
+headingFontWeights = ["700", "600", "500", "400", "400", "300"]
+codeFontSize = "14px"
+codeFontWeight = "400"
+
+# -----------------------------
+# Sidebar Font (Optional)
+# -----------------------------
+[theme.sidebar]
+font = "Roboto, sans-serif"
+headingFont = "Roboto Slab, serif"
+codeFont = "Source Code Pro, monospace"
+
+# -----------------------------
+# Chart / Plot Defaults
+# -----------------------------
+[theme.chart]
+backgroundColor = "#2C2F33"        # Chart panel background
+gridColor = "#3A3F45"              # Grid lines
+axisColor = "#F0F0F0"              # Axis text & labels
+lineColor = "#00BFFF"              # Default line plot color
+hoverLineColor = "#1E90FF"         # Line when hovering
+signalBuyColor = "#32CD32"         # Buy signal
+signalSellColor = "#FF4500"        # Sell signal
+highlightColor = "#FFD700"         # Highlight lines/markers
+volumeColor = "#FF8C00"            # Volume bars / alerts
+tooltipBackground = "#262A2F"      # Hover tooltip bg
+tooltipTextColor = "#F0F0F0"       # Hover tooltip text
