@@ -1,45 +1,57 @@
 {
-  "commodities": {
-    "precious_metals": {"Gold": "GC=F", "Silver": "SI=F", "Platinum": "PL=F"},
-    "industrial_metals": {
-      "Copper": "HG=F",
-      "Cobalt": "COB=F",
-      "Aluminum": "ALI=F",
-      "Steel Index": "^STEEL",
-      "Iron Ore (62% Fe, CFR China)": "TIO=F",
-      "Nickel": "NI=F"
-    },
-    "energy": {"WTI": "CL=F", "Brent": "BZ=F", "Natural Gas": "NG=F", "Heating Oil": "HO=F"},
-    "agriculture": {
-      "Corn": "ZC=F",
-      "Soybean": "ZS=F",
-      "Wheat": "KE=F",
-      "Rough Rice": "ZR=F",
-      "Orange Juice": "OJ=F",
-      "Coffee": "KC=F",
-      "Cocoa": "CC=F",
-      "Sugar": "SB=F"
-    },
-    "livestock": {"Cattle": "LE=F", "Feeder Cattle": "GF=F", "Lean Hogs": "HE=F"}
-  },
-  "indices": {
-    "US": {"S&P 500": "^GSPC", "Dow Jones": "^DJI", "Nasdaq": "^IXIC", "Russell 2000": "^RUT", "VIX": "^VIX"},
-    "Japan": {"Nikkei": "^N225"},
-    "Germany": {"DAX": "^GDAXI"},
-    "UK": {"FTSE 100": "^FTSE"},
-    "China": {"Shanghai Composite": "000001.SS"},
-    "Hong Kong": {"Hang Seng": "^HSI"},
-    "Europe": {"Euro Stoxx 50": "^STOXX50E"},
-    "Brazil": {"Bovespa": "^BVSP"}
-  },
   "macros": {
     "interest_rates": {
-      "US": {"10Y": "^TNX", "Fed Funds Rate": "FEDFUNDS"},
-      "Germany": {"10Y": "DE10Y"},
-      "UK": {"10Y": "GB10Y", "Bank Rate": "UKBR"},
-      "Japan": {"10Y": "JP10Y", "BOJ Rate": "JPBOJ"},
-      "China": {"10Y": "CN10Y", "PBOC Rate": "CNPBOC"},
-      "Brazil": {"10Y": "BR10Y", "Selic Rate": "BRSELIC"}
+      "US": {
+        "Government Debt Yields": {"13Wk T-Bill": "^IRX", "2Y": "2YY=F", "5Y": "^FVX", "10Y": "^TNX", "30Y": "^TYX"},
+        "Central Bank Rates": {"Fed Funds Rate": "FEDFUNDS.I"}
+      },
+      "Germany": {
+        "Government Debt Yields": {"10Y": "DE10Y"},
+        "Central Bank Rates": {"Bundesbank Rate": "DEBBR"}
+      },
+      "UK": {
+        "Government Debt Yields": {"10Y": "GB10Y"},
+        "Central Bank Rates": {"Bank Rate": "UKBR"}
+      },
+      "Japan": {
+        "Government Debt Yields": {"10Y": "JP10Y"},
+        "Central Bank Rates": {"BOJ Rate": "JPBOJ"}
+      },
+      "China": {
+        "Government Debt Yields": {"10Y": "CN10Y"},
+        "Central Bank Rates": {"PBOC Rate": "CNPBOC"}
+      },
+      "Brazil": {
+        "Government Debt Yields": {"10Y": "BR10Y"},
+        "Central Bank Rates": {"Selic Rate": "BRSELIC"}
+      }
+    },
+    "debt": {
+      "US": {
+        "Public Debt": {"10Y Treasury": "^TNX", "30Y Treasury": "^TYX", "13Wk T-Bill": "^IRX"},
+        "Corporate Debt": {
+          "Investment Grade": {
+            "ETF Proxies": {"LQD": "LQD", "VCLT": "VCLT"}
+          },
+          "High Yield": {
+            "ETF Proxies": {"HYG": "HYG", "JNK": "JNK"}
+          }
+        }
+      },
+      "Europe": {
+        "Public Debt": {"10Y Bund": "DE10Y", "10Y OAT": "FR10Y"},
+        "Corporate Debt": {
+          "Investment Grade": {"ETF Proxies": {"IBCI": "IBCI"}},
+          "High Yield": {"ETF Proxies": {"HYEI": "HYEI"}}
+        }
+      },
+      "UK": {
+        "Public Debt": {"10Y Gilt": "GB10Y"},
+        "Corporate Debt": {
+          "Investment Grade": {"ETF Proxies": {"IGUK": "IGUK"}},
+          "High Yield": {"ETF Proxies": {"HYUK": "HYUK"}}
+        }
+      }
     },
     "inflation": {
       "US CPI": "CPIAUCNS",
@@ -67,11 +79,24 @@
       "China": {"Unemployment Rate": "CHNUR", "GDP Growth": "CHNGDP", "PMI Manufacturing": "PMI_CN"},
       "Brazil": {"Unemployment Rate": "BRUR", "GDP Growth": "BRGDP", "PMI Manufacturing": "PMI_BR"}
     },
-    "commodity_indices": {
-      "CRB Index": "CRBINDX",
-      "Bloomberg Commodity Index": "BCOM",
-      "S&P GSCI": "SPGSCI",
-      "CDX": "CDX"
+    "commodities": {
+      "precious_metals": {"Gold": "GC=F", "Silver": "SI=F", "Platinum": "PL=F"},
+      "industrial_metals": {"Copper": "HG=F", "Cobalt": "COB=F", "Aluminum": "ALI=F", "Steel Index": "^STEEL", "Iron Ore": "TIO=F", "Nickel": "NI=F"},
+      "energy": {"WTI": "CL=F", "Brent": "BZ=F", "Natural Gas": "NG=F", "Heating Oil": "HO=F"},
+      "agriculture": {"Corn": "ZC=F", "Soybean": "ZS=F", "Wheat": "KE=F", "Rough Rice": "ZR=F", "Orange Juice": "OJ=F", "Coffee": "KC=F", "Cocoa": "CC=F", "Sugar": "SB=F"},
+      "livestock": {"Cattle": "LE=F", "Feeder Cattle": "GF=F", "Lean Hogs": "HE=F"}
+    },
+    "indices": {
+      "US": {"S&P 500": "^GSPC", "Dow Jones": "^DJI", "Nasdaq": "^IXIC", "Russell 2000": "^RUT", "VIX": "^VIX", "US Dollar Index": "DX-Y.NYB"},
+      "Japan": {"Nikkei": "^N225"},
+      "France": {"CAC 40": "^FCHI"},
+      "Germany": {"DAX": "^GDAXI"},
+      "UK": {"FTSE 100": "^FTSE"},
+      "China": {"Shanghai Composite": "000001.SS"},
+      "Hong Kong": {"Hang Seng": "^HSI"},
+      "Europe": {"Euro Stoxx 50": "^STOXX50E"},
+      "Brazil": {"Bovespa": "^BVSP"},
+      "Australia": {"ASX 200": "^AXJO"}
     }
   },
   "portfolios": {
@@ -79,7 +104,7 @@
     "Top 5 Shanghai": "600519.SS, 601398.SS, 600036.SS, 601318.SS, 601857.SS",
     "Top 5 Tokyo": "7203.T, 6758.T, 8306.T, 6861.T, 7974.T"
   },
-  "default_periods": ["1d", "5d", "1mo", "3mo", "6mo", "1y"],
+  "default_periods": ["5d", "1mo", "3mo", "6mo", "1y"],
   "default_intervals": ["1m", "5m", "15m", "1h", "1d"],
   "chart_colors": {
     "lineColor": "#00BFFF",

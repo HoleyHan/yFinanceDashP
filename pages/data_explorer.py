@@ -2,61 +2,49 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 from pathlib import Path
-import plotly.express as px
-import plotly.graph_objects as go
+import altair as alt
 
 # -------------------------------
 # SESSION STATE CACHE
 # -------------------------------
 if "df_cache" not in st.session_state:
-    st.session_state["df_cache"] = {}  # key = source_key, value = DataFrame
+    st.session_state["df_cache"] = {}
+
+st.title("Data Explorer")
 
 # -------------------------------
-# HELPER FUNCTIONS
+# PAGE LAYOUT: Side-by-side
 # -------------------------------
-def prettify(name: str) -> str:
-    """Convert snake_case to Title Case for UI display."""
-    return name.replace("_", " ").title()
+source_col, display_col = st.columns([1, 3])
 
 # -------------------------------
-# PAGE CONTAINER
+# DATA SOURCE SELECTION
 # -------------------------------
-with st.container():
-    st.header("Data Explorer")
+df = None
+source_key = None
 
-    # ---- DATA SOURCE SELECTION ----
-    data_source = st.radio(
-        "Select data source:",
-        ["Internal CSV", "Database"]
-    )
+with source_col:
+    data_source = st.radio("Select data source:", ["Internal CSV/Parquet", "Database"])
 
-    df = None
-    source_key = None
-
-    # ---- INTERNAL CSV ----
-    if data_source == "Internal CSV":
-        csv_folder = Path("data")
-        csv_files = list(csv_folder.glob("*.csv"))
-        file_choice = None
-        if csv_files:
-            file_choice = st.selectbox(
-                "Select CSV file",
-                [f.name for f in csv_files]
-            )
-
+    if data_source == "Internal CSV/Parquet":
+        data_folder = Path("data")
+        data_files = list(data_folder.glob("*.csv")) + list(data_folder.glob("*.parquet"))
+        file_choice = st.selectbox("Select file", [f.name for f in data_files])
         if file_choice:
             source_key = f"internal::{file_choice}"
             if source_key in st.session_state["df_cache"]:
                 df = st.session_state["df_cache"][source_key]
             else:
-                df = pd.read_csv(csv_folder / file_choice)
+                path = data_folder / file_choice
+                if path.suffix == ".csv":
+                    df = pd.read_csv(path)
+                else:
+                    df = pd.read_parquet(path)
                 st.session_state["df_cache"][source_key] = df
 
-    # ---- DATABASE ----
     elif data_source == "Database":
         db_path = st.text_input("SQLite DB path", value="data/local.db")
         table_name = st.text_input("Table name", value="my_table")
-
         if db_path and table_name and Path(db_path).exists():
             source_key = f"db::{db_path}::{table_name}"
             if source_key in st.session_state["df_cache"]:
@@ -70,85 +58,135 @@ with st.container():
                 st.session_state["df_cache"][source_key] = df
 
 # -------------------------------
-# DATA PROCESSING & FILTERS
+# DATA PROCESSING
 # -------------------------------
-if df is not None:
-    # Convert Date column if exists
+if df is not None and not df.empty:
+    # Handle Date column safely
     if "Date" in df.columns:
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df["Date"], utc=True)
+        df = df.sort_values("Date").reset_index(drop=True)
+        df["_Date_naive"] = df["Date"].dt.tz_convert(None)  # internal only
 
     numeric_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
     all_cols = df.columns.tolist()
 
-    # ---- FILTERS ----
-    display_to_col = {prettify(col): col for col in all_cols}
-    with st.container():
-        st.subheader("Filters")
-        filter_display_col = st.selectbox("Filter column", [None] + list(display_to_col.keys()))
-        filter_val = None
-        if filter_display_col:
-            col_name = display_to_col[filter_display_col]
-            filter_val = st.selectbox(f"Select {filter_display_col}", df[col_name].unique())
-        if filter_display_col and filter_val is not None:
-            df = df[df[col_name] == filter_val]
+    # -------------------------------
+    # FILTERS (collapsible)
+    # -------------------------------
+    with display_col:
+        with st.expander("Filters", expanded=False):
+            filter_col = st.selectbox("Filter column", [None] + [c for c in all_cols if c != "Date"])
+            filter_val = None
+            if filter_col:
+                filter_val = st.selectbox(f"Select {filter_col}", df[filter_col].unique())
+            if st.button("Reset Filters"):
+                filter_col = None
+                filter_val = None
 
-    # ---- CHART OPTIONS ----
-    with st.container():
+    # Apply filters
+    df_filtered = df.copy()
+    if filter_col and filter_val is not None:
+        df_filtered = df_filtered[df_filtered[filter_col] == filter_val]
+
+    # -------------------------------
+    # CHART OPTIONS
+    # -------------------------------
+    with display_col:
         st.subheader("Chart Options")
-        chart_type = st.selectbox("Select chart type", ["Line", "Bar", "Scatter", "Candlestick"])
+        chart_type = st.selectbox("Chart type", ["Line", "Scatter"])
+        y_cols = st.multiselect("Y-axis (select one or more)", numeric_cols, default=numeric_cols[:1])
 
-        if numeric_cols:
-            # Y-axis
-            y_display_to_col = {prettify(col): col for col in numeric_cols}
-            y_display = st.selectbox("Y axis", list(y_display_to_col.keys()))
-            y_col = y_display_to_col[y_display]
+    # -------------------------------
+    # DATE PICKERS UNDER CHART
+    # -------------------------------
+    if "Date" in df.columns:
+        col1, col2 = st.columns(2)
+        start_date = col1.date_input("Start date", df["_Date_naive"].min().date())
+        end_date = col2.date_input("End date", df["_Date_naive"].max().date())
+        df_filtered = df_filtered[
+            (df_filtered["_Date_naive"].dt.date >= start_date) &
+            (df_filtered["_Date_naive"].dt.date <= end_date)
+        ]
 
-            # X-axis: Date first if exists, then numeric excluding Y
-            x_options = ["Date"] if "Date" in df.columns else []
-            x_options += [col for col in numeric_cols if col != y_col]
-            x_display_to_col = {prettify(col): col for col in x_options if col != "Date"}
-            if "Date" in df.columns:
-                x_display_to_col["Date"] = "Date"
+    # -------------------------------
+    # PLOTTING (Altair)
+    # -------------------------------
+    if y_cols and not df_filtered.empty:
+        # Melt numeric columns for Altair
+        df_plot = df_filtered.melt(
+            id_vars=["_Date_naive"],
+            value_vars=y_cols,
+            var_name="Metric",
+            value_name="Value"
+        )
 
-            x_display = st.selectbox("X axis", list(x_display_to_col.keys()), index=0)
-            x_col = x_display_to_col[x_display]
-            x_data = df[x_col] if x_col in df.columns else df.index
+        # Optional: color by daily delta
+        df_plot["Delta"] = df_plot.groupby("Metric")["Value"].diff()
+        df_plot["Color"] = df_plot["Delta"].apply(lambda x: "green" if x >= 0 else "red")
 
-            # ---- PLOTTING ----
-            if chart_type == "Line":
-                fig = px.line(df, x=x_data, y=y_col)
-                st.plotly_chart(fig, use_container_width=True)
-            elif chart_type == "Bar":
-                fig = px.bar(df, x=x_data, y=y_col)
-                st.plotly_chart(fig, use_container_width=True)
-            elif chart_type == "Scatter":
-                fig = px.scatter(df, x=x_data, y=y_col)
-                st.plotly_chart(fig, use_container_width=True)
-            elif chart_type == "Candlestick":
-                required_cols = ["Open", "High", "Low", "Close"]
-                if all(col in df.columns for col in required_cols):
-                    fig = go.Figure(data=[go.Candlestick(
-                        x=df["Date"] if "Date" in df.columns else df.index,
-                        open=df["Open"],
-                        high=df["High"],
-                        low=df["Low"],
-                        close=df["Close"]
-                    )])
-                    st.plotly_chart(fig, use_container_width=True)
+        # Auto-scale points and line width
+        n_points = len(df_filtered)
+        base_point_size = 20
+        point_size = max(3, min(base_point_size, base_point_size * (100 / n_points)**0.5))
+        line_width = max(1, point_size * 0.3)
 
-    # ---- DATA TABLE ----
-    with st.container():
-        st.subheader("Data Table")
-        st.dataframe(df, use_container_width=True)
+        # Line chart
+        line_chart = alt.Chart(df_plot).mark_line(interpolate='monotone', size=line_width).encode(
+            x=alt.X('_Date_naive:T', title='Date'),
+            y=alt.Y('Value:Q', title=', '.join(y_cols)),
+            color='Metric:N',
+            tooltip=['Metric:N', 'Value:Q', alt.Tooltip('_Date_naive:T', title='Date')]
+        )
 
-    # ---- SUMMARY METRICS ----
+        # Points chart
+        points = alt.Chart(df_plot).mark_point(filled=True, size=point_size).encode(
+            x='_Date_naive:T',
+            y='Value:Q',
+            color='Metric:N',
+            tooltip=['Metric:N', 'Value:Q', alt.Tooltip('_Date_naive:T', title='Date')]
+        )
+
+        # Combine line + points
+        final_chart = (line_chart + points).interactive(bind_x=False)
+        final_chart = final_chart.configure(background='black').configure_axis(
+            labelColor='amber', titleColor='amber'
+        ).configure_legend(
+            labelColor='amber', titleColor='amber'
+        ).configure_title(
+            color='amber'
+        )
+
+        st.altair_chart(final_chart, use_container_width=True)
+
+    # -------------------------------
+    # HORIZONTAL DIVIDER
+    # -------------------------------
+    st.markdown("---")
+
+    # -------------------------------
+    # DATA TABLE
+    # -------------------------------
+    st.subheader("Data Table")
+
+    # Styler: numeric columns formatted, text centered
+    styler = df_filtered.style.set_properties(**{'text-align': 'center'})
     if numeric_cols:
-        with st.container():
-            st.subheader("Summary Metrics")
-            metrics_cols = st.columns(len(numeric_cols))
-            for i, col in enumerate(numeric_cols):
-                metrics_cols[i].metric(label=f"{prettify(col)} Min", value=f"{df[col].min():.2f}")
-                metrics_cols[i].metric(label=f"{prettify(col)} Max", value=f"{df[col].max():.2f}")
-                metrics_cols[i].metric(label=f"{prettify(col)} Avg", value=f"{df[col].mean():.2f}")
+        styler = styler.format({col: "{:.2f}" for col in numeric_cols}, na_rep="-")
+
+    st.dataframe(styler, use_container_width=True)
+
+    # -------------------------------
+    # SUMMARY METRICS
+    # -------------------------------
+    st.subheader("Summary Metrics")
+    metrics_cols = st.columns(len(y_cols))
+    for i, col in enumerate(y_cols):
+        val_min = df_filtered[col].min()
+        val_max = df_filtered[col].max()
+        val_avg = df_filtered[col].mean()
+        metrics_cols[i].metric(label=f"{col} Min", value=f"{val_min:.2f}", delta=f"{val_min:.2f}")
+        metrics_cols[i].metric(label=f"{col} Max", value=f"{val_max:.2f}", delta=f"{val_max:.2f}")
+        metrics_cols[i].metric(label=f"{col} Avg", value=f"{val_avg:.2f}", delta=f"{val_avg:.2f}")
+
 else:
-    st.info("Select or upload a data source to start exploring data.")
+    st.info("Select a file or database table to start exploring data.")

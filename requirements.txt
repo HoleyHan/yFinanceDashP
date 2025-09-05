@@ -6,3 +6,4 @@ free_proxy
 yfinance==0.2.65
 streamlit-javascript==0.1.5
 SQLAlchemy==1.4.0
+altair
